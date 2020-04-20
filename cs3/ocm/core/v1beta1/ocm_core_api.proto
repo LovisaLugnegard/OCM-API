@@ -51,6 +51,10 @@ import "cs3/types/v1beta1/types.proto";
 service OcmCoreAPI {
   // Creates a new ocm share.
   rpc CreateOCMCoreShare(CreateOCMCoreShareRequest) returns (CreateOCMCoreShareResponse);
+  // Gets an ocm share.
+  rpc GetOCMCoreShare(GetOCMCoreShareRequest) returns (GetOCMCoreShareResponse);
+  // Lists all ocm shares.
+  rpc ListOCMCoreShares(ListOCMCoreSharesRequest) returns (ListOCMCoreSharesResponse);
 }
 
 // https://rawgit.com/GEANT/OCM-API/v1/docs.html#null%2Fpaths%2F~1shares%2Fpost
@@ -91,4 +95,68 @@ message CreateOCMCoreShareResponse {
   string id = 3;
   // REQUIRED.
   cs3.types.v1beta1.Timestamp created = 4;
+}
+
+message ListOCMSharesRequest {
+  // OPTIONAL.
+  // Opaque information.
+  cs3.types.v1beta1.Opaque opaque = 1;
+  // REQUIRED.
+  // represents a filter to apply to the request.
+  message Filter {
+    // REQUIRED.
+    // The filter to apply.
+    enum Type {
+      TYPE_INVALID = 0;
+      TYPE_NO = 1;
+      TYPE_RESOURCE_ID = 2;
+      TYPE_OWNER = 3;
+      TYPE_CREATOR = 4;
+      TYPE_OWNER_PROVIDER = 5;
+      TYPE_CREATOR_PROVIDER = 6;
+    }
+    // REQUIRED.
+    Type type = 2;
+    oneof term {
+      storage.provider.v1beta1.ResourceId resource_id = 3;
+      cs3.identity.user.v1beta1.UserId owner = 4;
+      cs3.identity.user.v1beta1.UserId creator = 5;
+    }
+  }
+  // OPTIONAL.
+  // The list of filters to apply if any.
+  repeated Filter filters = 2;
+}
+
+message ListOCMSharesResponse {
+  // REQUIRED.
+  // The response status.
+  cs3.rpc.v1beta1.Status status = 1;
+  // OPTIONAL.
+  // Opaque information.
+  cs3.types.v1beta1.Opaque opaque = 2;
+  // REQUIRED.
+  // The list of shares.
+  repeated Share shares = 3;
+}
+
+message GetOCMShareRequest {
+  // OPTIONAL.
+  // Opaque information.
+  cs3.types.v1beta1.Opaque opaque = 1;
+  // REQUIRED.
+  // The reference to which the action should be performed.
+  ShareReference ref = 2;
+}
+
+message GetOCMShareResponse {
+  // REQUIRED.
+  // The response status.
+  cs3.rpc.v1beta1.Status status = 1;
+  // OPTIONAL.
+  // Opaque information.
+  cs3.types.v1beta1.Opaque opaque = 2;
+  // REQUIRED.
+  // The share.
+  Share share = 3;
 }
